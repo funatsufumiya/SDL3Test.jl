@@ -298,47 +298,6 @@ function main()
     end
 
     free_event(event)
-
-    # opt = uiInitOptions(0)
-    # # opt_ptr = Ref(opt)
-
-    # err = uiInit(opt)
-    # if err != C_NULL
-    #     println("Error initializing libui-ng: ", err)
-    #     uiFreeInitError(err)
-    # end
-
-    # onClosing = @cfunction(onClose, Cint, (uiWindow, UserData))
-    # onMsgBoxClicked = @cfunction(onMsgBoxClick, Cvoid, (uiControl, UserData))
-
-    # global w = uiNewWindow("Hello World", 300, 300, 0)
-    # grid = uiNewGrid()
-    # uiGridSetPadded(grid, 1)
-
-    # button = uiNewButton("Message Box")
-    # uiButtonOnClicked(button, onMsgBoxClicked, C_NULL);
-
-    # uiGridAppend(grid, button,
-	# 	0, 0, 1, 1,
-	# 	0, uiAlignFill, 0, uiAlignFill);
-
-    # uiWindowSetChild(w, grid);
-    # # uiWindowSetChild(w, button);
-
-    # # println("window: ", w)
-    # # println("grid: ", grid)
-
-    # uiWindowOnClosing(w, onClosing, C_NULL);
-    # uiControlShow(w)
-
-    # try
-    #     uiMain()
-    # finally
-    #     # println("already_quitted: ", (already_quitted))
-    #     if !(already_quitted)
-    #         uiUninit()
-    #     end
-    # end
 end
 
 end # module SDL3Test
