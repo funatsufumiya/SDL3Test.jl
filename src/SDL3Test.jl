@@ -14,7 +14,9 @@ end
 #     Size::Csize_t
 # end
 
-# const uiWindow = Ptr{Cvoid}
+const SDL_Window_Ptr = Ptr{Cvoid}
+const SDL_Renderer_Ptr = Ptr{Cvoid}
+
 # const uiControl = Ptr{Cvoid}
 # const uiButton = Ptr{Cvoid}
 # const uiGrid = Ptr{Cvoid}
@@ -30,23 +32,13 @@ end
 const SDL_InitFlags = Cuint
 const SDL_INIT_VIDEO::Cuint = 0x00000020
 
+const SDL_WindowFlags = Cuint
+
 SDL_Init=(flag)->ccall((:SDL_Init, sdl3_lib),Cint,(SDL_InitFlags,),flag)
 SDL_GetError=(flag)->ccall((:SDL_GetError, sdl3_lib),Cstring,(),)
-# uiInit=(o)->ccall((:uiInit,sdl3_lib),Cstring,(Ref{uiInitOptions},),o)
-# uiFreeInitError=(err)->ccall((:uiFreeInitError,sdl3_lib),Cvoid,(Cstring,),err)
-# uiNewWindow=(title, width, height, hasMenuBar)->ccall((:uiNewWindow,sdl3_lib),uiWindow,(Cstring,Cint,Cint,Cint),title,width,height,hasMenuBar)
-# uiNewGrid=()->ccall((:uiNewGrid,sdl3_lib),Ptr{Cvoid},(),)
-# uiControlShow=(c)->ccall((:uiControlShow,sdl3_lib),Cvoid,(uiControl,),c)
-# uiGridSetPadded=(grid, pad)->ccall((:uiGridSetPadded,sdl3_lib),Cvoid,(uiControl,Cint),grid,pad)
-# uiNewButton=(s)->ccall((:uiNewButton,sdl3_lib),uiControl,(Cstring,),s)
-# uiWindowSetChild=(win, c)->ccall((:uiWindowSetChild,sdl3_lib),Cvoid,(uiWindow, uiControl,),win,c)
-# uiMain=()->ccall((:uiMain,sdl3_lib),Cvoid,(),)
-# uiQuit=()->ccall((:uiQuit,sdl3_lib),Cvoid,(),)
-# uiUninit=()->ccall((:uiUninit,sdl3_lib),Cvoid,(),)
-# uiWindowOnClosing=(win, onClosing, data)->ccall((:uiWindowOnClosing,sdl3_lib),Cvoid,(Ptr{Cvoid},OnClosingFuncType,UserData),win,onClosing,data)
-# uiButtonOnClicked=(c, func, data)->ccall((:uiButtonOnClicked,sdl3_lib),Cvoid,(Ptr{Cvoid},Ptr{Cvoid},UserData),c,func,data)
-# uiMsgBox=(win,msg1,msg2)->ccall((:uiMsgBox,sdl3_lib),Cvoid,(uiWindow, Cstring, Cstring),win,msg1,msg2)
-# uiGridAppend=(g,c,left,top,xspan,yspan,hexpand,halign,vexpand,valign)->ccall((:uiGridAppend,sdl3_lib),Cvoid,(uiGrid, uiControl, Cint, Cint, Cint, Cint, Cint, uiAlign, Cint, uiAlign),g,c,left,top,xspan,yspan,hexpand,halign,vexpand,valign)
+SDL_CreateWindow=(title, w, h, flags)->ccall((:SDL_CreateWindow, sdl3_lib),SDL_Window_Ptr,(Cstring, Cint, Cint, SDL_WindowFlags),title,w,h,flags)
+SDL_CreateRenderer=(win, name)->ccall((:SDL_CreateRenderer, sdl3_lib),SDL_Renderer_Ptr,(SDL_Window_Ptr, Cstring),win,name)
+
 
 global already_quitted = false
 # global w::uiWindow
@@ -80,6 +72,21 @@ function main()
         println("SDL_Init() Error: ", SDL_GetError())
         return
     end
+
+    window = SDL_CreateWindow("HelloWorld SDL3", 640, 480, 0);
+    if window == C_NULL
+        println("SDL_CreateWindow() Error: ", SDL_GetError())
+        return
+    end
+
+    renderer = SDL_CreateRenderer(window, C_NULL);
+
+    if window == C_NULL
+        println("SDL_CreateRenderer() Error: ", SDL_GetError())
+        return
+    end
+
+    sleep(1.0)
 
     # opt = uiInitOptions(0)
     # # opt_ptr = Ref(opt)
