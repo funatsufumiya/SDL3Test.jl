@@ -12,20 +12,7 @@ end
 
 const SDL_Window_Ptr = Ptr{Cvoid}
 const SDL_Renderer_Ptr = Ptr{Cvoid}
-
 const SDL_Event_Ptr = Ptr{Cvoid}
-
-# const uiControl = Ptr{Cvoid}
-# const uiButton = Ptr{Cvoid}
-# const uiGrid = Ptr{Cvoid}
-# const OnClosingFuncType = Ptr{Cvoid}
-# const UserData = Ptr{Cvoid}
-
-# const uiAlign = Cint
-# uiAlignFill::Cint = 0
-# uiAlignStart::Cint = 1
-# uiAlignCenter::Cint = 2
-# uiAlignEnd::Cint = 3
 
 const Cbool = UInt8
 
@@ -115,20 +102,6 @@ SDL_RenderPresent=(ren)->ccall((:SDL_RenderPresent, sdl3_lib),Cbool,(SDL_Rendere
 global running = true
 global mouseRect::SDL_FRect = SDL_FRect(0, 0, 0, 0)
 global renderer::SDL_Renderer_Ptr
-
-# global w::uiWindow
-
-# function onClose(w::uiWindow, data::UserData)::Cint
-#     global already_quitted = true
-#     uiQuit()
-#     return 1
-# end
-
-# function onMsgBoxClick(b::uiButton, data::UserData)
-# 	uiMsgBox(w,
-# 	    "This is a normal message box.",
-# 		"More detailed information can be shown here.")
-# end
 
 function new_event()::SDL_Event_Ptr
     return Libc.malloc(128)
