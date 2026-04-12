@@ -29,6 +29,13 @@ const SDL_Event_Ptr = Ptr{Cvoid}
 
 const Cbool = UInt8
 
+mutable struct SDL_FRect
+    x::Cfloat
+    y::Cfloat
+    w::Cfloat
+    h::Cfloat
+end
+
 const SDL_InitFlags = Cuint
 const SDL_INIT_VIDEO::Cuint = 0x00000020
 
@@ -98,9 +105,16 @@ SDL_CreateWindow=(title, w, h, flags)->ccall((:SDL_CreateWindow, sdl3_lib),SDL_W
 SDL_CreateRenderer=(win, name)->ccall((:SDL_CreateRenderer, sdl3_lib),SDL_Renderer_Ptr,(SDL_Window_Ptr, Cstring),win,name)
 SDL_GetRendererName=(ren)->ccall((:SDL_GetRendererName, sdl3_lib),Cstring,(SDL_Renderer_Ptr,),ren)
 SDL_PollEvent=(ev)->ccall((:SDL_PollEvent, sdl3_lib),Cint,(SDL_Event_Ptr,),ev)
+SDL_GetTicks=()->ccall((:SDL_GetTicks, sdl3_lib),UInt64,(),)
 SDL_GetKeyName=(keycode)->ccall((:SDL_GetKeyName, sdl3_lib),Cstring,(SDL_Keycode,),keycode)
+SDL_RenderClear=(ren)->ccall((:SDL_RenderClear, sdl3_lib),Cbool,(SDL_Renderer_Ptr,),ren)
+SDL_RenderFillRect=(ren, rect)->ccall((:SDL_RenderFillRect, sdl3_lib),Cbool,(SDL_Renderer_Ptr,SDL_FRect),ren,rect)
+SDL_SetRenderDrawColor=(ren, r, g, b, a)->ccall((:SDL_SetRenderDrawColor, sdl3_lib),Cbool,(SDL_Renderer_Ptr,UInt8,UInt8,UInt8,UInt8),ren,r,g,b,a)
+SDL_RenderPresent=(ren)->ccall((:SDL_RenderPresent, sdl3_lib),Cbool,(SDL_Renderer_Ptr,),ren)
 
 global running = true
+global mouseRect::SDL_FRect = SDL_FRect(0, 0, 0, 0)
+global renderer::SDL_Renderer_Ptr
 
 # global w::uiWindow
 
@@ -200,7 +214,7 @@ function init()
         return
     end
 
-    renderer = SDL_CreateRenderer(window, C_NULL);
+    global renderer = SDL_CreateRenderer(window, C_NULL);
 
     if renderer == C_NULL
         println("SDL_CreateRenderer() Error: ", unsafe_string(SDL_GetError()))
@@ -220,6 +234,13 @@ function main()
 
     event::SDL_Event_Ptr = new_event()
 
+    # ensure it's offscreen at startup
+    global mouseRect.x = -1000
+    global mouseRect.y = -1000
+
+    global mouseRect.w = 50
+    global mouseRect.h = 50
+
     while running
         while SDL_PollEvent(event) == 1
             event_type = get_event_type(event)
@@ -232,8 +253,10 @@ function main()
                 println("Mouse up")
                 btn_event = get_mousebuttonevent(event)
             elseif event_type == SDL_EVENT_MOUSE_MOTION
-                println("Mouse move")
+                # println("Mouse move")
                 motion_event = get_mousemotionevent(event)
+                mouseRect.x = motion_event.x - (mouseRect.w / 2.0);
+                mouseRect.y = motion_event.y - (mouseRect.h / 2.0);
             elseif event_type == SDL_EVENT_QUIT
                 println("Quitting...")
                 global running = false
@@ -263,6 +286,14 @@ function main()
             #     break
             # end
         end
+
+        sineWave = sin(((float(SDL_GetTicks() % 3000)) / 3000.0) * 2.0 * pi);
+        r = UInt8(trunc(sineWave * 127.0 + 127));
+        SDL_SetRenderDrawColor(renderer, r, 0, 0, 255)
+        SDL_RenderClear(renderer)
+        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255)
+        SDL_RenderFillRect(renderer, mouseRect)
+        SDL_RenderPresent(renderer)
     end
 
     free_event(event)
