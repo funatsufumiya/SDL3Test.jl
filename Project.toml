@@ -1,0 +1,4 @@
+name = "SDL3Test"
+uuid = "945ac890-5e65-4b1b-ab3d-566402b90650"
+version = "0.1.0"
+authors = ["Fumiya Funatsu <funatsu.fumiya@gmail.com>"]
