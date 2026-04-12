@@ -108,7 +108,7 @@ SDL_PollEvent=(ev)->ccall((:SDL_PollEvent, sdl3_lib),Cint,(SDL_Event_Ptr,),ev)
 SDL_GetTicks=()->ccall((:SDL_GetTicks, sdl3_lib),UInt64,(),)
 SDL_GetKeyName=(keycode)->ccall((:SDL_GetKeyName, sdl3_lib),Cstring,(SDL_Keycode,),keycode)
 SDL_RenderClear=(ren)->ccall((:SDL_RenderClear, sdl3_lib),Cbool,(SDL_Renderer_Ptr,),ren)
-SDL_RenderFillRect=(ren, rect)->ccall((:SDL_RenderFillRect, sdl3_lib),Cbool,(SDL_Renderer_Ptr,SDL_FRect),ren,rect)
+SDL_RenderFillRect=(ren, rect)->ccall((:SDL_RenderFillRect, sdl3_lib),Cbool,(SDL_Renderer_Ptr,Ref{SDL_FRect}),ren,rect)
 SDL_SetRenderDrawColor=(ren, r, g, b, a)->ccall((:SDL_SetRenderDrawColor, sdl3_lib),Cbool,(SDL_Renderer_Ptr,UInt8,UInt8,UInt8,UInt8),ren,r,g,b,a)
 SDL_RenderPresent=(ren)->ccall((:SDL_RenderPresent, sdl3_lib),Cbool,(SDL_Renderer_Ptr,),ren)
 
@@ -287,12 +287,13 @@ function main()
             # end
         end
 
-        sineWave = sin(((float(SDL_GetTicks() % 3000)) / 3000.0) * 2.0 * pi);
-        r = UInt8(trunc(sineWave * 127.0 + 127));
+        sineWave = sin(((float(SDL_GetTicks() % 3000)) / 3000.0) * 2.0 * pi)
+        r = UInt8(trunc(sineWave * 127.0 + 127))
         SDL_SetRenderDrawColor(renderer, r, 0, 0, 255)
         SDL_RenderClear(renderer)
         SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255)
         SDL_RenderFillRect(renderer, mouseRect)
+        # println("MouseRect: ", mouseRect)
         SDL_RenderPresent(renderer)
     end
 
