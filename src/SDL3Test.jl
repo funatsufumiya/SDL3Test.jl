@@ -38,6 +38,9 @@ const SDL_EventType = UInt32
 const SDL_EVENT_QUIT::UInt32 = 0x100
 const SDL_EVENT_KEY_DOWN::UInt32 = 0x300
 const SDL_EVENT_KEY_UP::UInt32 = 0x301
+const SDL_EVENT_MOUSE_MOTION::UInt32 = 1024
+const SDL_EVENT_MOUSE_BUTTON_DOWN::UInt32 = 1025
+const SDL_EVENT_MOUSE_BUTTON_UP::UInt32 = 1026
 
 const SDL_Keycode = UInt32
 const SDLK_RETURN = 0x0000000d
@@ -45,6 +48,8 @@ const SDLK_ESCAPE = 0x0000001b
 
 const SDL_WindowID = UInt32
 const SDL_KeyboardID = UInt32
+const SDL_MouseID = UInt32
+const SDL_MouseButtonFlags = UInt32
 const SDL_Scancode = UInt64
 const SDL_Keymod = UInt16
 
@@ -58,6 +63,33 @@ mutable struct SDL_KeyboardEvent
     raw::UInt32
     down::Cbool
     repeat::Cbool
+end
+
+mutable struct SDL_MouseButtonEvent
+    type::SDL_EventType
+    reserved::UInt32
+    timestamp::UInt64
+    windowID::SDL_WindowID
+    which::SDL_MouseID
+    button::UInt8
+    down::Cbool
+    clicks::UInt8
+    padding::UInt8
+    x::Cfloat
+    y::Cfloat
+end
+
+mutable struct SDL_MouseMotionEvent
+    type::SDL_EventType
+    reserved::UInt32
+    timestamp::UInt64
+    windowID::SDL_WindowID
+    which::SDL_MouseID
+    state::SDL_MouseButtonFlags
+    x::Cfloat
+    y::Cfloat
+    xrel::Cfloat
+    yrel::Cfloat
 end
 
 SDL_Init=(flag)->ccall((:SDL_Init, sdl3_lib),Cint,(SDL_InitFlags,),flag)
@@ -106,6 +138,29 @@ function get_keyevent(ev::SDL_Event_Ptr)::SDL_KeyboardEvent
     # println("isDown: ", key_event.down == 1 ," ( ", key_event.down," )")
     # println("isRepeat: ", key_event.repeat == 1 ," ( ", key_event.repeat," )")
     return key_event
+end
+
+function get_mousebuttonevent(ev::SDL_Event_Ptr)::SDL_MouseButtonEvent
+    tp=Ptr{SDL_MouseButtonEvent}(ev)
+    btn_event = unsafe_load(tp)
+    # println("MouseButtonEvent: ", btn_event)
+    # println("Button: ", btn_event.button)
+    # println("isDown: ", btn_event.down == 1 ," ( ", btn_event.down," )")
+    # println("Clicks: ", btn_event.clicks)
+    # println("X: ", btn_event.x)
+    # println("Y: ", btn_event.y)
+    return btn_event
+end
+
+function get_mousemotionevent(ev::SDL_Event_Ptr)::SDL_MouseMotionEvent
+    tp=Ptr{SDL_MouseMotionEvent}(ev)
+    motion_event = unsafe_load(tp)
+    # println("MouseMotionEvent: ", motion_event)
+    # println("X: ", motion_event.x)
+    # println("Y: ", motion_event.y)
+    # println("Xrel: ", motion_event.xrel)
+    # println("Yrel: ", motion_event.yrel)
+    return motion_event
 end
 
 function get_event_scancode(ev::SDL_Event_Ptr)::SDL_Scancode
@@ -170,8 +225,15 @@ function main()
             event_type = get_event_type(event)
             # println("Event type: ", event_type)
 
-            if event_type >= 1024
-                # just ignore
+            if event_type == SDL_EVENT_MOUSE_BUTTON_DOWN
+                println("Mouse down")
+                btn_event = get_mousebuttonevent(event)
+            elseif event_type == SDL_EVENT_MOUSE_BUTTON_UP
+                println("Mouse up")
+                btn_event = get_mousebuttonevent(event)
+            elseif event_type == SDL_EVENT_MOUSE_MOTION
+                println("Mouse move")
+                motion_event = get_mousemotionevent(event)
             elseif event_type == SDL_EVENT_QUIT
                 println("Quitting...")
                 global running = false
