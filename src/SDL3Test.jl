@@ -38,7 +38,7 @@ SDL_Init=(flag)->ccall((:SDL_Init, sdl3_lib),Cint,(SDL_InitFlags,),flag)
 SDL_GetError=(flag)->ccall((:SDL_GetError, sdl3_lib),Cstring,(),)
 SDL_CreateWindow=(title, w, h, flags)->ccall((:SDL_CreateWindow, sdl3_lib),SDL_Window_Ptr,(Cstring, Cint, Cint, SDL_WindowFlags),title,w,h,flags)
 SDL_CreateRenderer=(win, name)->ccall((:SDL_CreateRenderer, sdl3_lib),SDL_Renderer_Ptr,(SDL_Window_Ptr, Cstring),win,name)
-
+SDL_GetRendererName=(ren)->ccall((:SDL_GetRendererName, sdl3_lib),Cstring,(SDL_Renderer_Ptr,),ren)
 
 global already_quitted = false
 # global w::uiWindow
@@ -69,22 +69,25 @@ function main()
     ret = SDL_Init(SDL_INIT_VIDEO)
 
     if ret < 0
-        println("SDL_Init() Error: ", SDL_GetError())
+        println("SDL_Init() Error: ", unsafe_string(SDL_GetError()))
         return
     end
 
     window = SDL_CreateWindow("HelloWorld SDL3", 640, 480, 0);
     if window == C_NULL
-        println("SDL_CreateWindow() Error: ", SDL_GetError())
+        println("SDL_CreateWindow() Error: ", unsafe_string(SDL_GetError()))
         return
     end
 
     renderer = SDL_CreateRenderer(window, C_NULL);
 
-    if window == C_NULL
-        println("SDL_CreateRenderer() Error: ", SDL_GetError())
+    if renderer == C_NULL
+        println("SDL_CreateRenderer() Error: ", unsafe_string(SDL_GetError()))
         return
     end
+
+    renderer_name = unsafe_string(SDL_GetRendererName(renderer))
+    println("Renderer: ", renderer_name)
 
     sleep(1.0)
 
