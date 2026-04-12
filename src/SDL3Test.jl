@@ -17,6 +17,8 @@ end
 const SDL_Window_Ptr = Ptr{Cvoid}
 const SDL_Renderer_Ptr = Ptr{Cvoid}
 
+const SDL_Event_Ptr = Ptr{Cvoid}
+
 # const uiControl = Ptr{Cvoid}
 # const uiButton = Ptr{Cvoid}
 # const uiGrid = Ptr{Cvoid}
@@ -39,8 +41,10 @@ SDL_GetError=(flag)->ccall((:SDL_GetError, sdl3_lib),Cstring,(),)
 SDL_CreateWindow=(title, w, h, flags)->ccall((:SDL_CreateWindow, sdl3_lib),SDL_Window_Ptr,(Cstring, Cint, Cint, SDL_WindowFlags),title,w,h,flags)
 SDL_CreateRenderer=(win, name)->ccall((:SDL_CreateRenderer, sdl3_lib),SDL_Renderer_Ptr,(SDL_Window_Ptr, Cstring),win,name)
 SDL_GetRendererName=(ren)->ccall((:SDL_GetRendererName, sdl3_lib),Cstring,(SDL_Renderer_Ptr,),ren)
+SDL_PollEvent=(ev)->ccall((:SDL_PollEvent, sdl3_lib),Cint,(SDL_Event_Ptr,),ev)
 
-global already_quitted = false
+global running = true
+
 # global w::uiWindow
 
 # function onClose(w::uiWindow, data::UserData)::Cint
@@ -65,7 +69,7 @@ function julia_main()
     return 0
 end
 
-function main()
+function init()
     ret = SDL_Init(SDL_INIT_VIDEO)
 
     if ret < 0
@@ -89,7 +93,24 @@ function main()
     renderer_name = unsafe_string(SDL_GetRendererName(renderer))
     println("Renderer: ", renderer_name)
 
-    sleep(1.0)
+    global running = true
+end
+
+function main()
+    init()
+
+    event::SDL_Event_Ptr = Libc.malloc(128)
+
+    while running
+        while SDL_PollEvent(event) == 1
+            sleep(1.0)
+            break
+        end
+        
+        break
+    end
+
+    Libc.free(event)
 
     # opt = uiInitOptions(0)
     # # opt_ptr = Ref(opt)
