@@ -4,13 +4,19 @@ julia_version = "1.12.6"
 manifest_format = "2.0"
 project_hash = "725ec9d830ef34f07709e757f0973e35a2e99340"
 
+[[deps.Artifacts]]
+uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
+version = "1.11.0"
+
 [[deps.SDL3Test]]
+deps = ["SDL3_prebuilt_jll"]
 path = "."
 uuid = "945ac890-5e65-4b1b-ab3d-566402b90650"
 version = "0.1.0"
 
 [[deps.SDL3_prebuilt_jll]]
-git-tree-sha1 = "b727bb91c0d0686ff4bed324157b6a828f6cb670"
+deps = ["Artifacts"]
+git-tree-sha1 = "3c03fde9e389ece89f0194a83bc5b51ae9d733ff"
 repo-rev = "main"
 repo-url = "https://github.com/funatsufumiya/SDL3_prebuilt_jll.git"
 uuid = "c5603e48-dc29-4a18-ab97-2f56521043f2"
