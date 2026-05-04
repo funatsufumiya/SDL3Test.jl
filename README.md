@@ -2,6 +2,10 @@
 
 ![screenshot](./docs/screenshot.png)
 
+## Dependencies
+
+- https://github.com/funatsufumiya/SDL3_prebuilt_jll
+
 ## Run
 
 ```bash
