@@ -1,13 +1,21 @@
 module SDL3Test
 
-sdl3_lib = "libSDL3.so"
+using SDL3_prebuilt_jll
 
-@static if Sys.iswindows()
-   sdl3_lib = "libSDL3.dll"
-elseif Sys.isapple()
-   sdl3_lib = "libSDL3.dylib"
-else
-   sdl3_lib = "libSDL3.so"
+# sdl3_lib = "libSDL3.so"
+
+# @static if Sys.iswindows()
+#    sdl3_lib = "libSDL3.dll"
+# elseif Sys.isapple()
+#    sdl3_lib = "libSDL3.dylib"
+# else
+#    sdl3_lib = "libSDL3.so"
+# end
+
+sdl3_lib = SDL3_prebuilt_jll.get_lib_path()
+if isnothing(sdl3_lib)
+    println("[Error] SDL3 not found (maybe this platform is not supported yet by SDL3_prebuilt_jll)")
+    exit(1)
 end
 
 const SDL_Window_Ptr = Ptr{Cvoid}
